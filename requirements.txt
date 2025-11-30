@@ -1,0 +1,7 @@
+streamlit
+numpy
+pandas
+scipy
+yfinance
+plotly
+streamlit-js-eval
