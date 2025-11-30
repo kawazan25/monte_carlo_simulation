@@ -7,7 +7,7 @@ st.title("インデックス投資の暇つぶしWebApp")
 st.write("シミュレーションの内容ごとにページ分けしています。")
 st.write("左のメニューからページ選択してください。")
 st.write("こちらの記事もご参考ください。")
-st.write("URL")
+st.write("URL:https://note.com/kawazan25")
 
 st.subheader("目次")
 st.markdown("""
