@@ -46,10 +46,9 @@ def selectbox_with_lock(title, options_key, original_options, is_premium):
     if not is_premium and selected.startswith("🔒"):
         st.warning("この選択肢は有料です。利用するにはパスコードで認証してください。")
         st.warning("Note記事をご購入ください🙏")
-        clean_value = display_options[0].replace("🔒 ", "")
-        return display_options[0]
-    else:
-        clean_value = selected.replace("🔒 ", "")
+    
+    # 表示用の鍵マークを除去した「内部値」を返す
+    clean_value = selected.replace("🔒 ", "")
 
     return clean_value.split(":")[0]
 
@@ -363,6 +362,10 @@ selected_option2_2 = selectbox_with_lock(
     option2_2_list,
     is_premium
 )
+print(selected_option1_1)
+print(selected_option1_2)
+print(selected_option2_1)
+print(selected_option2_2)
 
 st.markdown("**グラフ表示範囲設定**")
 col1, col2 = st.columns(2)
@@ -397,6 +400,14 @@ is_mobile = is_mobile_device(ua)
 # シミュレーション実行ボタン
 # -------------------------
 if st.button("▶ シミュレーション実行(STEP2)"):
+    # チェック対象のキー一覧
+    option_keys = ["option1_1", "option1_2", "option2_1", "option2_2"]
+    for key in option_keys:
+        raw_value = st.session_state.get(key, "")
+        if "🔒" in raw_value:
+            st.error("有料の選択肢が選択されています。認証しないと実行できません。")
+            st.stop()
+
     n_months = simulation_years * 12
     monthly_need = initial_monthly_need
 
