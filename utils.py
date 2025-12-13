@@ -66,16 +66,16 @@ def withdrawal_strategy(
     """
     #(case1)取り崩し額が生活費を上回っていたら
     #  - (case1-1)貯金が上限に達していたら
-    #    - (option1-1-1)生活費までを取り崩す（必要最低限の資産取り崩し、資産確保優先）
-    #    - (option1-1-2)余剰資金はすべて消費する（積極的に消費、消費優先）
+    #    - (option1-1-1)余剰資金はすべて消費する（積極的に消費、消費優先）
+    #    - (option1-1-2)生活費までを取り崩す（必要最低限の資産取り崩し、資産確保優先）
     #  - (case1-2)貯金が上限に達していなかったら
-    #    - (option1-2-1)生活費を差し引いた余剰分を貯金に回す（現金貯金を手厚くする、貯金確保優先）
+    #    - (option1-2-1)余剰金はすべて消費する（積極的に消費する、消費優先）
     #    - (option1-2-2)貯金最低額以上あれば、余剰金は消費する　貯金最低額以下ならば、余剰金は貯金する（貯金と消費のバランスを取る）
-    #    - (option1-2-3)余剰金はすべて消費する（積極的に消費する、消費優先）
+    #    - (option1-2-3)生活費を差し引いた余剰分を貯金に回す（現金貯金を手厚くする、貯金確保優先）
     #(case2)取り崩し額が生活費を下回っていたら
     #  - (case2-1)貯金から不足分を補えるなら
-    #    - (option2-1-1)取り崩したうえで、貯金で不足分を補う（生活費確保優先）
-    #    - (option2-1-2)取り崩したうえで、不足分は別の手段で確保する/取り崩し額の範囲で生活する（貯金確保優先）
+    #    - (option2-1-1)取り崩したうえで、不足分は別の手段で確保する/取り崩し額の範囲で生活する（貯金確保優先）
+    #    - (option2-1-2)取り崩したうえで、貯金で不足分を補う（生活費確保優先）
     #    - (option2-1-3)取り崩しはせず、可能な限り貯金から補う　不足分は別の手段で確保する（資産確保優先）
     #  - (case2-2)貯金では不足分を補えないなら
     #    - (option2-2-1)取り崩したうえで、不足分は別の手段で確保する/取り崩し額の範囲で生活する（貯金確保優先）
@@ -86,21 +86,13 @@ def withdrawal_strategy(
         excess = withdrawal - monthly_need
         if savings >= max_savings:  # case1-1
             if option1_1 == "1-1-1":
-                used = monthly_need
-            elif option1_1 == "1-1-2":
                 used = withdrawal
+            elif option1_1 == "1-1-2":
+                used = monthly_need
         else:  # case1-2
             if option1_2 == "1-2-1":
-                excess = withdrawal - monthly_need
-                if excess > 0:
-                    savings += excess
-                used = monthly_need
-                #to_savings = min(excess, max_savings - savings)
-                #savings += to_savings
-                #used = monthly_need + (excess - to_savings)
-            elif option1_2 == "1-2-3":
                 used = withdrawal
-            else:
+            elif option1_2 == "1-2-2":
                 # バランス型(1-2-2)
                 if savings < min_savings:
                     to_savings = min(excess, max_savings - savings)
@@ -108,13 +100,21 @@ def withdrawal_strategy(
                     used = monthly_need + (excess - to_savings)
                 else:
                     used = withdrawal
+            else:
+                excess = withdrawal - monthly_need
+                if excess > 0:
+                    savings += excess
+                used = monthly_need
+                #to_savings = min(excess, max_savings - savings)
+                #savings += to_savings
+                #used = monthly_need + (excess - to_savings)
     else:  # case2
         if savings >= monthly_need: #case2-1
             if option2_1 == "2-1-1":
+                used = withdrawal
+            elif option2_1 == "2-1-2":
                 savings -= (monthly_need - withdrawal)
                 used = monthly_need
-            elif option2_1 == "2-1-2":
-                used = withdrawal
             else:  # 2-1-3
                 used = min(monthly_need, savings)
                 savings -= used

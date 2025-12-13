@@ -252,10 +252,10 @@ st.markdown("""
 st.markdown("**基本設定**")
 col1, col2 = st.columns(2)
 with col1:
-    initial_assets = st.number_input("初期投資資産（万円）", value=5000, step=100)
-    initial_monthly_need = st.number_input("初期生活費（月額, 万円）", value=40, step=1)
+    initial_assets = st.number_input("初期投資資産（万円）", value=4000, step=100)
+    initial_monthly_need = st.number_input("初期生活費（月額, 万円）", value=20, step=1)
 with col2:
-    initial_savings = st.number_input("初期現金貯金（万円）", value=1500, step=50)
+    initial_savings = st.number_input("初期現金貯金（万円）", value=400, step=50)
     simulation_years = st.number_input("シミュレーション年数", value=30, step=1)
 
 col1, col2 = st.columns(2)
@@ -275,7 +275,7 @@ with col2:
 st.markdown("**取り崩し率設定**")
 col1, col2 = st.columns(2)
 with col1:
-    withdrawal_rate = st.number_input("取り崩し率（月次, %）", value=1.7, step=0.1)
+    withdrawal_rate = st.number_input("取り崩し率（月次, %）", value=1.0, step=0.1)
 
 n_trials = 500 #試行回数（モンテカルロシミュレーション）
 
@@ -283,16 +283,16 @@ n_trials = 500 #試行回数（モンテカルロシミュレーション）
 #資産に対する定率取り崩し額を計算する
 #(case1)取り崩し額が生活費を上回っていたら
 #  - (case1-1)貯金が上限に達していたら
-#    - (option1-1-1)生活費までを取り崩す（必要最低限の資産取り崩し、資産確保優先）
-#    - (option1-1-2)余剰資金はすべて消費する（積極的に消費、消費優先）
+#    - (option1-1-1)余剰資金はすべて消費する（積極的に消費、消費優先）
+#    - (option1-1-2)生活費までを取り崩す（必要最低限の資産取り崩し、資産確保優先）
 #  - (case1-2)貯金が上限に達していなかったら
-#    - (option1-2-1)生活費を差し引いた余剰分を貯金に回す（現金貯金を手厚くする、貯金確保優先）
+#    - (option1-2-1)余剰金はすべて消費する（積極的に消費する、消費優先）
 #    - (option1-2-2)貯金最低額以上あれば、余剰金は消費する　貯金最低額以下ならば、余剰金は貯金する（貯金と消費のバランスを取る）
-#    - (option1-2-3)余剰金はすべて消費する（積極的に消費する、消費優先）
+#    - (option1-2-3)生活費を差し引いた余剰分を貯金に回す（現金貯金を手厚くする、貯金確保優先）
 #(case2)取り崩し額が生活費を下回っていたら
 #  - (case2-1)貯金から不足分を補えるなら
-#    - (option2-1-1)取り崩したうえで、貯金で不足分を補う（生活費確保優先）
-#    - (option2-1-2)取り崩したうえで、不足分は別の手段で確保する/取り崩し額の範囲で生活する（貯金確保優先）
+#    - (option2-1-1)取り崩したうえで、不足分は別の手段で確保する/取り崩し額の範囲で生活する（貯金確保優先）
+#    - (option2-1-2)取り崩したうえで、貯金で不足分を補う（生活費確保優先）
 #    - (option2-1-3)取り崩しはせず、可能な限り貯金から補う　不足分は別の手段で確保する（資産確保優先）
 #  - (case2-2)貯金では不足分を補えないなら
 #    - (option2-2-1)取り崩したうえで、不足分は別の手段で確保する/取り崩し額の範囲で生活する（貯金確保優先）
@@ -312,19 +312,19 @@ is_premium = st.session_state.get("is_premium", False)
 
 #選択肢
 option1_1_list = [
-    "1-1-1: 生活費までを取り崩す（必要最低限の資産取り崩し、資産確保優先）",
-    "1-1-2: 余剰資金はすべて消費する（積極的に消費、消費優先）"
+    "1-1-1: 余剰資金はすべて消費する（積極的に消費、消費優先）",
+    "1-1-2: 生活費までを取り崩す（必要最低限の資産取り崩し、資産確保優先）"
 ]
 
 option1_2_list = [
-    "1-2-1: 生活費を差し引いた余剰分を貯金に回す（現金貯金を手厚くする、貯金確保優先）",
+    "1-2-1: 余剰金はすべて消費する（積極的な消費）",
     "1-2-2: 貯金最低額以上あれば、余剰金は消費する　貯金最低額以下ならば、余剰金は貯金する（バランス型）",
-    "1-2-3: 余剰金はすべて消費する（積極的な消費）"
+    "1-2-3: 生活費を差し引いた余剰分を貯金に回す（現金貯金を手厚くする、貯金確保優先）",
 ]
 
 option2_1_list = [
-    "2-1-1: 取り崩したうえで、貯金で不足分を補う（生活費確保優先）",
-    "2-1-2: 取り崩したうえで、不足分は別の手段で確保する（貯金確保優先）",
+    "2-1-1: 取り崩したうえで、不足分は別の手段で確保する（貯金確保優先）",
+    "2-1-2: 取り崩したうえで、貯金で不足分を補う（生活費確保優先）",
     "2-1-3: 取り崩しはせず、可能な限り貯金から補う（資産確保優先）"
 ]
 
@@ -362,17 +362,13 @@ selected_option2_2 = selectbox_with_lock(
     option2_2_list,
     is_premium
 )
-print(selected_option1_1)
-print(selected_option1_2)
-print(selected_option2_1)
-print(selected_option2_2)
 
 st.markdown("**グラフ表示範囲設定**")
 col1, col2 = st.columns(2)
 with col1:
     st.markdown("**① 総資産**")
     y_min_total = st.number_input("最小値（万円）", value=0, key="y_min_total")
-    y_max_total = st.number_input("最大値（万円）", value=10000, key="y_max_total")
+    y_max_total = st.number_input("最大値（万円）", value=20000, key="y_max_total")
 
     st.markdown("**③ 貯金**")
     y_min_savings = st.number_input("最小値（万円）", value=0, key="y_min_savings")
@@ -381,7 +377,7 @@ with col1:
 with col2:
     st.markdown("**② 株式資産**")
     y_min_assets = st.number_input("最小値（万円）", value=0, key="y_min_assets")
-    y_max_assets = st.number_input("最大値（万円）", value=10000, key="y_max_assets")
+    y_max_assets = st.number_input("最大値（万円）", value=20000, key="y_max_assets")
 
     st.markdown("**④ 生活費と使用額**")
     y_min_used = st.number_input("最小値（万円）", value=0, key="y_min_used")
